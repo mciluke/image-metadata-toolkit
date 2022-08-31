@@ -2,35 +2,81 @@ import React, { Component } from 'react';
 const axios = require("axios");
  
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state ={
+      title: 'Image Metadata Toolkit'
+    };
+  }
   componentDidMount() {
     // fetch('/api').then(data => console.log(data));
   } 
   render() {
     // let result;
     // fetch('http://localhost:3000').then(data => data.json()).then(data => result = data);
+    // let title = 'Image Metadata Toolkit'
     return (
       <div>
-        <h1>Image Metadata Toolkit 3000</h1>
+        <h1 id='test' onClick={() => this.setState({title: this.state.title == 'Image Metadata Toolkit 3000' ? 'Image Metadata Toolkit' : 'Image Metadata Toolkit 3000'})}>{this.state.title}</h1>
         <MainComponent />
+        {/* <FilesComponent /> */}
       </div>
     )
    }
 }
-
+class FilesBox extends Component {
+  render() {
+    console.log('rendered the files box')
+    console.log(this.props.files.length)
+    if (this.props.files.length){
+      const files = [];
+      this.props.files.forEach((el, ind) => {
+        files.push(
+          <span key={ind} id={'img' + ind}>
+            <img src={'/files/' + el}></img>
+          </span>
+        )
+      })
+      return (
+        <div id="files">
+          <hr />
+          <h3>My Files:</h3>
+          {files}
+        </div>
+      )
+    }
+    else return '';
+  }
+}
 class MainComponent extends Component {
   constructor(props) {
     super(props);
     this.state ={
         file: null,
         uploaded: false,
-        exifData: null
+        exifData: null,
+        modified: false,
+        files: []
     };
     this.onFormSubmit = this.onFormSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
     this.updateMetadata = this.updateMetadata.bind(this);
   }
+  componentDidMount() {
+    fetch('/checkForUserFiles')
+    .then(resp => resp.json())
+    .then(data => {
+      console.log(data)
+      this.setState({files: data})
+    });
+  }
   componentDidUpdate() {
     console.log('component update fired');
+    if (this.state.modified) {
+      console.log('file ready at', `/processed/${this.state.filename}`)
+      // axios.get(`/processed/${this.state.filename}`)
+
+    }
   }
   onFormSubmit(e) {
     e.preventDefault();
@@ -55,21 +101,32 @@ class MainComponent extends Component {
   updateMetadata(e) {
     const objectToSend = {};
     objectToSend.originalFilename = document.querySelector(`#fname`).placeholder;
-    objectToSend.newFilename = document.querySelector(`#fname`).value || objectToSend.originalFilename;
+    objectToSend.newFilename = document.querySelector(`#fname`).value || 'updated_' + objectToSend.originalFilename;
     for (const key in this.state.exifData) {
       objectToSend[key] = document.querySelector(`#${key}`).value || document.querySelector(`#${key}`).placeholder;
     }
     console.log(objectToSend);
     axios.post('/modify', objectToSend)
-      .then(response => console.log(response))
+      .then(response => {
+        console.log(response)
+        this.setState({modified: true, filename: response.data.filename})
+      })
   }
 
   render() {
     console.log('rendered.')
-    if (this.state.uploaded) {
-      return <ImageBox filename={this.state.file.name} exifData={this.state.exifData} updateMetadata={this.updateMetadata}/>
-    } else
-    return <UploadBox onFormSubmit={this.onFormSubmit} onChange={this.onChange} />
+    if (this.state.uploaded && !this.state.modified) {
+      //if the user uploaded and has not yet sent changes, show the image and text fields
+      return <ImageBox filename={this.state.file.name} exifData={this.state.exifData} newFilename={this.state.filename} updateMetadata={this.updateMetadata}/>
+    } else {
+    //if the user 
+    return (
+      <div id="appy">
+        <UploadBox onFormSubmit={this.onFormSubmit} onChange={this.onChange} />
+        <FilesBox files={this.state.files} />
+      </div>
+    )
+    }
   }
 }
 
@@ -87,7 +144,14 @@ class UploadBox extends Component {
 
 class ImageBox extends Component {
   render() {
+    console.log('render image box', this.props.newFilename)
     let metadata = [];
+    metadata.push(
+      <div key={'fname'} id="metadata">
+        <label>File name:</label>
+        <input type="text" key={this.props.filename} id="fname" name="fname" placeholder={this.props.filename}></input>
+      </div>
+    )
     for (const key in this.props.exifData) {
       metadata.push(
         <div key={key + 'div'} id="metadata">
@@ -95,13 +159,18 @@ class ImageBox extends Component {
           <input type="text" key={key} id={key} name={key} placeholder={this.props.exifData[key]}></input>
         </div>);
     }
+    if (this.props.newFilename) {
+      metadata = [];
+      metadata.push(
+        <div key="download"></div>
+      )
+    }
     return (
       <div id='image'>
         <h4>Image:</h4>
         <img src={'files/' + this.props.filename}></img><br />
-        <label>File name:</label>
-        <input type="text" key={this.props.filename} id="fname" name="fname" placeholder={this.props.filename}></input>
         {metadata}
+
         <button type="submit" onClick={this.props.updateMetadata}>Update</button>
       </div>
     )

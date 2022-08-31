@@ -37,6 +37,8 @@ module.exports = {
 			'/upload': 'http://localhost:3000/',
       '/files': 'http://localhost:3000/',
 			'/modify': 'http://localhost:3000/',
+			'/processed': 'http://localhost:3000/',
+			'/checkForUserFiles': 'http://localhost:3000/'
 			// '/api/leaders': 'http://localhost:3000',
 		},
 	},
