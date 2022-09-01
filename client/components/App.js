@@ -33,7 +33,7 @@ class FilesBox extends Component {
       this.props.files.forEach((el, ind) => {
         files.push(
           <span key={ind} id={'img' + ind}>
-            <img onClick={() => console.log('clicked')}src={'/files/' + el}></img>
+            <img onClick={() => this.props.expandImage(el)}src={'/files/' + el}></img>
           </span>
         )
       })
@@ -61,6 +61,7 @@ class MainComponent extends Component {
     this.onFormSubmit = this.onFormSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
     this.updateMetadata = this.updateMetadata.bind(this);
+    this.expandImage = this.expandImage.bind(this);
   }
   componentDidMount() {
     fetch('/checkForUserFiles')
@@ -77,6 +78,12 @@ class MainComponent extends Component {
       this.setState({modified:false, uploaded:false, newFilename: ''});
       // axios.get(`/processed/${this.state.filename}`)
     }
+  }
+  expandImage(e) {
+    console.log('clicked img', e)
+
+    this.setState({uploaded: false, modified: false, view: this.state.view == true ? false : true, file: {name: e}});
+
   }
   onFormSubmit(e) {
     e.preventDefault();
@@ -118,13 +125,22 @@ class MainComponent extends Component {
     if (this.state.uploaded && !this.state.modified) {
       //if the user uploaded and has not yet sent changes, show the image and text fields
       return <ImageBox filename={this.state.file.name} exifData={this.state.exifData} newFilename={this.state.filename} updateMetadata={this.updateMetadata}/>
-    } else {
+    } 
+    else if (this.state.view) {
+      //just view the image and download links
+      return (
+      <div id="viewer">
+        <ImageBox expandImage={this.expandImage} filename={this.state.file.name} view={this.state.view}/>
+      </div>
+      )
+    }
+    else {
     //if the user 
     // this.setState({modified:false, uploaded:false});
     return (
       <div id="appy">
         <UploadBox onFormSubmit={this.onFormSubmit} onChange={this.onChange} />
-        <FilesBox files={this.state.files} />
+        <FilesBox expandImage={this.expandImage} files={this.state.files} view={this.state.view}/>
       </div>
     )
     }
@@ -145,7 +161,22 @@ class UploadBox extends Component {
 
 class ImageBox extends Component {
   render() {
-    console.log('render image box', this.props.newFilename)
+    console.log('hi')
+    // console.log(this.props)
+    if (this.props.view) {
+      console.log('render image box for viewing!', this.props.filename);
+      return (
+        <div id='image'>
+          <h4>Image:</h4>
+          <img onClick={this.props.expandImage} src={'/files/updated_' + this.props.filename}></img><br />
+          <a target="_blank" href={'/files/updated_' + this.props.filename}>Download Modified</a><br />
+          <a target="_blank" href={'/files/' + this.props.filename}>Download Original</a><br />
+          <a href="#">Delete File</a>
+        </div>
+      )
+    } else {
+    //upload
+    console.log('render image box for upload!', this.props.newFilename)
     let metadata = [];
     metadata.push(
       <div key={'fname'} id="metadata">
@@ -160,20 +191,14 @@ class ImageBox extends Component {
           <input type="text" key={key} id={key} name={key} placeholder={this.props.exifData[key]}></input>
         </div>);
     }
+    console.log('metadata:', metadata.length)
     metadata.push(
       <div id="google static map">
-        <img src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA`}></img>
+        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}>Refresh Map</button><br />
+        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}></img>
       </div>
+      
     );
-    //AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA api key
-    //https://maps.googleapis.com/maps/api/staticmap?center=41.072125%2c%20-72.43842222222223&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA
-
-    // if (this.props.newFilename) {
-    //   metadata = [];
-    //   metadata.push(
-    //     <div key="download"></div>
-    //   )
-    // }
     return (
       <div id='image'>
         <h4>Image:</h4>
@@ -183,6 +208,7 @@ class ImageBox extends Component {
         <button type="submit" onClick={this.props.updateMetadata}>Update</button>
       </div>
     )
+  }
   }
 }
 
