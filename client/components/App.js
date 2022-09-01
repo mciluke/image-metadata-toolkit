@@ -72,10 +72,10 @@ class MainComponent extends Component {
   }
   componentDidUpdate() {
     console.log('component update fired');
-    if (this.state.modified) {
-      console.log('file ready at', `/processed/${this.state.filename}`)
+    if (this.state.modified && this.state.uploaded) {
+      // console.log('file ready at', `/processed/${this.state.filename}`)
+      this.setState({modified:false, uploaded:false, newFilename: ''});
       // axios.get(`/processed/${this.state.filename}`)
-
     }
   }
   onFormSubmit(e) {
@@ -109,7 +109,7 @@ class MainComponent extends Component {
     axios.post('/modify', objectToSend)
       .then(response => {
         console.log(response)
-        this.setState({modified: true, filename: response.data.filename})
+        this.setState({modified: true, filename: response.data.filename, files: [...this.state.files, response.data.filename]})
       })
   }
 
@@ -120,6 +120,7 @@ class MainComponent extends Component {
       return <ImageBox filename={this.state.file.name} exifData={this.state.exifData} newFilename={this.state.filename} updateMetadata={this.updateMetadata}/>
     } else {
     //if the user 
+    // this.setState({modified:false, uploaded:false});
     return (
       <div id="appy">
         <UploadBox onFormSubmit={this.onFormSubmit} onChange={this.onChange} />
@@ -159,12 +160,12 @@ class ImageBox extends Component {
           <input type="text" key={key} id={key} name={key} placeholder={this.props.exifData[key]}></input>
         </div>);
     }
-    if (this.props.newFilename) {
-      metadata = [];
-      metadata.push(
-        <div key="download"></div>
-      )
-    }
+    // if (this.props.newFilename) {
+    //   metadata = [];
+    //   metadata.push(
+    //     <div key="download"></div>
+    //   )
+    // }
     return (
       <div id='image'>
         <h4>Image:</h4>
