@@ -8,4 +8,24 @@ body {
 #files img {
   max-width: 100px;
   height: auto;
+  margin: 5px;
+}
+
+.form-control {
+  max-width: 400px;
+}
+
+.uploader {
+  max-width: 95px;
+}
+
+.column {
+  float: left;
+  width: 25%;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
 }

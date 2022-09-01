@@ -16,8 +16,8 @@ class App extends Component {
     // fetch('http://localhost:3000').then(data => data.json()).then(data => result = data);
     // let title = 'Image Metadata Toolkit'
     return (
-      <div>
-        <h1 id='test' onClick={() => this.setState({title: this.state.title == 'Image Metadata Toolkit 3000' ? 'Image Metadata Toolkit' : 'Image Metadata Toolkit 3000'})}>{this.state.title}</h1>
+      <div class="jumbotron">
+        <h1 class="display-4" id='test' onClick={() => this.setState({title: this.state.title == 'Image Metadata Toolkit 3000' ? 'Image Metadata Toolkit' : 'Image Metadata Toolkit 3000'})}>{this.state.title}</h1>
         <MainComponent />
         {/* <FilesComponent /> */}
       </div>
@@ -33,7 +33,7 @@ class FilesBox extends Component {
       this.props.files.forEach((el, ind) => {
         files.push(
           <span key={ind} id={'img' + ind}>
-            <img onClick={() => this.props.expandImage(el)}src={'/files/' + el}></img>
+            <img onClick={() => this.props.expandImage(el)} src={'/files/' + el}></img>
           </span>
         )
       })
@@ -116,7 +116,7 @@ class MainComponent extends Component {
     axios.post('/modify', objectToSend)
       .then(response => {
         console.log(response)
-        this.setState({modified: true, filename: response.data.filename, files: [...this.state.files, response.data.filename]})
+        this.setState({modified: true, filename: response.data.filename, files: [...this.state.files, objectToSend.originalFilename]})
       })
   }
 
@@ -129,7 +129,7 @@ class MainComponent extends Component {
     else if (this.state.view) {
       //just view the image and download links
       return (
-      <div id="viewer">
+      <div class="lead" id="viewer">
         <ImageBox expandImage={this.expandImage} filename={this.state.file.name} view={this.state.view}/>
       </div>
       )
@@ -138,7 +138,7 @@ class MainComponent extends Component {
     //if the user 
     // this.setState({modified:false, uploaded:false});
     return (
-      <div id="appy">
+      <div class="lead" id="appy">
         <UploadBox onFormSubmit={this.onFormSubmit} onChange={this.onChange} />
         <FilesBox expandImage={this.expandImage} files={this.state.files} view={this.state.view}/>
       </div>
@@ -150,11 +150,13 @@ class MainComponent extends Component {
 class UploadBox extends Component {
   render() {
     return (
-      <form onSubmit={this.props.onFormSubmit}>
-        <h3>Upload an image (*.jpg)</h3>
-        <input type="file" name="myImage" onChange={this.props.onChange} />
-        <button type="submit">Upload</button>
-      </form>
+      <div class="">
+        <form onSubmit={this.props.onFormSubmit}>
+          <h3>Upload an image (*.jpg)</h3>
+          <input class="form-control form-control-sm" type="file" name="myImage" onChange={this.props.onChange} />
+          <button type="submit" class="uploader form-control form-control-sm btn btn-primary">Upload</button>
+        </form>
+      </div>
     )
   }
 }
@@ -166,12 +168,12 @@ class ImageBox extends Component {
     if (this.props.view) {
       console.log('render image box for viewing!', this.props.filename);
       return (
-        <div id='image'>
+        <div class="row" id='image'>
           <h4>Image:</h4>
-          <img onClick={this.props.expandImage} src={'/files/updated_' + this.props.filename}></img><br />
-          <a target="_blank" href={'/files/updated_' + this.props.filename}>Download Modified</a><br />
+          <div class="column"><img onClick={this.props.expandImage} src={'/files/updated_' + this.props.filename}></img><br /></div>
+          <div class="column"><a target="_blank" href={'/files/updated_' + this.props.filename}>Download Modified</a><br />
           <a target="_blank" href={'/files/' + this.props.filename}>Download Original</a><br />
-          <a href="#">Delete File</a>
+          <a href="#">Delete File</a></div>
         </div>
       )
     } else {
@@ -194,18 +196,18 @@ class ImageBox extends Component {
     console.log('metadata:', metadata.length)
     metadata.push(
       <div id="google static map">
-        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}>Refresh Map</button><br />
-        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}></img>
+        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=300x250&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}>Refresh Map</button><br />
+        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=300x250&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}></img>
       </div>
       
     );
     return (
-      <div id='image'>
+      <div class="row" id='image'>
         <h4>Image:</h4>
-        <img src={'files/' + this.props.filename}></img><br />
-        {metadata}
+        <div class="column"><img src={'files/' + this.props.filename}></img></div>
+        <div class="column">{metadata}
 
-        <button type="submit" onClick={this.props.updateMetadata}>Update</button>
+        <button type="submit" onClick={this.props.updateMetadata}>Update</button></div>
       </div>
     )
   }
