@@ -33,7 +33,7 @@ class FilesBox extends Component {
       this.props.files.forEach((el, ind) => {
         files.push(
           <span key={ind} id={'img' + ind}>
-            <img onClick={() => this.props.expandImage(el)}src={'/files/' + el}></img>
+            <img onClick={() => this.props.expandImage(el)} src={'/files/' + el}></img>
           </span>
         )
       })
@@ -116,7 +116,7 @@ class MainComponent extends Component {
     axios.post('/modify', objectToSend)
       .then(response => {
         console.log(response)
-        this.setState({modified: true, filename: response.data.filename, files: [...this.state.files, response.data.filename]})
+        this.setState({modified: true, filename: response.data.filename, files: [...this.state.files, objectToSend.originalFilename]})
       })
   }
 
@@ -194,8 +194,8 @@ class ImageBox extends Component {
     console.log('metadata:', metadata.length)
     metadata.push(
       <div id="google static map">
-        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}>Refresh Map</button><br />
-        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}></img>
+        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA`}>Refresh Map</button><br />
+        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA`}></img>
       </div>
       
     );
