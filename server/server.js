@@ -164,7 +164,6 @@ app.get('/processed/:filename', serveImage, (req, res) => {
 })
 
 app.get('/checkForUserFiles', checkCookie, getFiles, (req, res) => {
-
   res.json(res.locals.files)
 })
 

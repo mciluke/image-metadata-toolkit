@@ -33,7 +33,7 @@ class FilesBox extends Component {
       this.props.files.forEach((el, ind) => {
         files.push(
           <span key={ind} id={'img' + ind}>
-            <img src={'/files/' + el}></img>
+            <img onClick={() => console.log('clicked')}src={'/files/' + el}></img>
           </span>
         )
       })
@@ -160,6 +160,14 @@ class ImageBox extends Component {
           <input type="text" key={key} id={key} name={key} placeholder={this.props.exifData[key]}></input>
         </div>);
     }
+    metadata.push(
+      <div id="google static map">
+        <img src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA`}></img>
+      </div>
+    );
+    //AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA api key
+    //https://maps.googleapis.com/maps/api/staticmap?center=41.072125%2c%20-72.43842222222223&zoom=12&size=400x400&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA
+
     // if (this.props.newFilename) {
     //   metadata = [];
     //   metadata.push(
