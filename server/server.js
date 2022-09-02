@@ -141,11 +141,30 @@ const getFiles = (req, res, next) => {
   })
 }
 
+const deleteFile = (req, res, next) => {
+  // req.params.file
+  databaseModel.findOne({uid: req.cookies.uid}).then(resp => {
+    let newFilesList = resp.files.filter(el => el !== req.params.file);
+    console.log('about to delete a file', req.params.file);
+    console.log('deleteing from', response);
+    databaseModel.findOneAndUpdate({uid: req.cookies.uid}, {files: newFilesList}, {new:true})
+      .then(resp => {
+        console.log('deleted! now it looks like:', resp)
+        res.locals.newFileList = resp;
+        next();
+      });
+  })
+}
+
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
 //routes
+//route'/' serve index.html that npm run build output
+// app.use('/', (req, res) => res.sendFile(path.resolve(__dirname, '../build/index.html')));
+
 app.use('/files', express.static(path.join(__dirname, '../uploads')));
 
 app.post('/upload', upload.single('myImage'), readExifData, linkUploadToUser, (req, res) => {
@@ -166,5 +185,9 @@ app.get('/processed/:filename', serveImage, (req, res) => {
 app.get('/checkForUserFiles', checkCookie, getFiles, (req, res) => {
   res.json(res.locals.files)
 })
+
+app.get('/delete/:file', deleteFile, (req, res) => {
+  res.json(res.locals.newFileList);
+});
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

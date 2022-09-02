@@ -62,6 +62,7 @@ class MainComponent extends Component {
     this.onChange = this.onChange.bind(this);
     this.updateMetadata = this.updateMetadata.bind(this);
     this.expandImage = this.expandImage.bind(this);
+    this.deleteFile = this.deleteFile.bind(this);
   }
   componentDidMount() {
     fetch('/checkForUserFiles')
@@ -78,6 +79,13 @@ class MainComponent extends Component {
       this.setState({modified:false, uploaded:false, newFilename: ''});
       // axios.get(`/processed/${this.state.filename}`)
     }
+  }
+  deleteFile(e) {
+    console.log('delete', e);
+    fetch('/delete/' + e).then(resp => {
+      this.setState({uploaded: false, modified: false, view: this.state.view == true ? false : true, file: {name: e}});
+
+    })
   }
   expandImage(e) {
     console.log('clicked img', e)
@@ -121,7 +129,7 @@ class MainComponent extends Component {
   }
 
   render() {
-    console.log('rendered.')
+    console.log('rendered main component.')
     if (this.state.uploaded && !this.state.modified) {
       //if the user uploaded and has not yet sent changes, show the image and text fields
       return <ImageBox filename={this.state.file.name} exifData={this.state.exifData} newFilename={this.state.filename} updateMetadata={this.updateMetadata}/>
@@ -130,7 +138,7 @@ class MainComponent extends Component {
       //just view the image and download links
       return (
       <div class="lead" id="viewer">
-        <ImageBox expandImage={this.expandImage} filename={this.state.file.name} view={this.state.view}/>
+        <ImageBox deleteFile={this.deleteFile} expandImage={this.expandImage} filename={this.state.file.name} view={this.state.view}/>
       </div>
       )
     }
@@ -173,7 +181,10 @@ class ImageBox extends Component {
           <div class="column"><img onClick={this.props.expandImage} src={'/files/updated_' + this.props.filename}></img><br /></div>
           <div class="column"><a target="_blank" href={'/files/updated_' + this.props.filename}>Download Modified</a><br />
           <a target="_blank" href={'/files/' + this.props.filename}>Download Original</a><br />
-          <a href="#">Delete File</a></div>
+          <button type="submit" onClick={() => {
+            this.props.deleteFile(this.props.filename);
+            this.props.expandImage();
+          }}>Delete File</button></div>
         </div>
       )
     } else {
@@ -196,8 +207,8 @@ class ImageBox extends Component {
     console.log('metadata:', metadata.length)
     metadata.push(
       <div id="google static map">
-        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=300x250&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}>Refresh Map</button><br />
-        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=300x250&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxh`}></img>
+        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=300x250&key=`}>Refresh Map</button><br />
+        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=300x250&key=`}></img>
       </div>
       
     );
