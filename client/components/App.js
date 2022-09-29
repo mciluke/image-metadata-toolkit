@@ -207,8 +207,8 @@ class ImageBox extends Component {
     console.log('metadata:', metadata.length)
     metadata.push(
       <div id="google static map">
-        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=300x250&key=`}>Refresh Map</button><br />
-        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=300x250&key=`}></img>
+        <button type="submit" onClick={() => document.querySelector("#map").src = `https://maps.googleapis.com/maps/api/staticmap?center=${document.querySelector("#decimalLatitude").value}%2c%20${document.querySelector("#decimalLongitude").value}&zoom=12&size=300x250&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA`}>Refresh Map</button><br />
+        <img id="map" src={`https://maps.googleapis.com/maps/api/staticmap?center=${this.props.exifData.decimalLatitude}%2c%20${this.props.exifData.decimalLongitude}&zoom=12&size=300x250&key=AIzaSyCcO8NepIZPmMYPvi7EBkzP0QRwZduPxhA`}></img>
       </div>
       
     );
