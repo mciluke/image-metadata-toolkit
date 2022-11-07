@@ -1,3 +1,5 @@
+const databaseModel = require('../models/databaseModel')
+
 const userController = {};
 
 userController.checkCookie = (req, res, next) => {

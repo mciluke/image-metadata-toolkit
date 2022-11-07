@@ -1,8 +1,11 @@
 const path = require('path');
 const multer = require('multer');
 // const databaseModel = require('./controllers/userController');
+const databaseModel = require('../models/databaseModel')
 
 const fileController = {};
+
+
 
 fileController.serveImage = (req, res, next) => {
   res.locals.image = path.join(__dirname, '../uploads/', req.params.filename);
@@ -34,15 +37,6 @@ fileController.deleteFile = (req, res, next) => {
 };
 
 fileController.uploadFile = (req, res, next) => {
-  const storage = multer.diskStorage({
-    destination(request, file, cb) {
-      cb(null, './uploads');
-    },
-    filename(request, file, cb) {
-      cb(null, file.originalname);
-    },
-  });
-  const upload = multer({ storage });
   upload.single('myImage');
   return next();
 };

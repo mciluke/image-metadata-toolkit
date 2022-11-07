@@ -5,12 +5,12 @@ const path = require('path');
 const exifController = {};
 
 exifController.getBase64DataFromJpegFile = filename => fs.readFileSync(filename).toString('binary');
-exifController.getExifFromJpegFile = filename => piexif.load(getBase64DataFromJpegFile(filename));
+exifController.getExifFromJpegFile = filename => piexif.load(exifController.getBase64DataFromJpegFile(filename));
 
 
 exifController.readExifData = (req, res, next) => {
-    exifData = getExifFromJpegFile(path.join(__dirname, '../uploads/', req.file.filename))
-    // console.log(exifData);
+    exifData = exifController.getExifFromJpegFile(path.join(__dirname, '../../uploads/', req.file.filename))
+    console.log(exifData);
     const make = exifData['0th'][piexif.ImageIFD.Make];
     const model = exifData['0th'][piexif.ImageIFD.Model];
     const osVersion = exifData['0th'][piexif.ImageIFD.Software];
@@ -24,12 +24,20 @@ exifController.readExifData = (req, res, next) => {
     const longitude = exifData['GPS'][piexif.GPSIFD.GPSLongitude];
     const longitudeRef = exifData['GPS'][piexif.GPSIFD.GPSLongitudeRef];
   
-    const latitudeMultiplier = latitudeRef == 'N' ? 1 : -1;
-    const decimalLatitude = latitudeMultiplier * piexif.GPSHelper.dmsRationalToDeg(latitude);
-    const longitudeMultiplier = longitudeRef == 'E' ? 1 : -1;
-    const decimalLongitude = longitudeMultiplier * piexif.GPSHelper.dmsRationalToDeg(longitude);
+    try {
+      const latitudeMultiplier = latitudeRef == 'N' ? 1 : -1;
+      const decimalLatitude = latitudeMultiplier * piexif.GPSHelper.dmsRationalToDeg(latitude);
+      const longitudeMultiplier = longitudeRef == 'E' ? 1 : -1;
+      const decimalLongitude = longitudeMultiplier * piexif.GPSHelper.dmsRationalToDeg(longitude);
+      res.locals.exifData = {make, model, osVersion, dateTime, dateTimeOriginal, subSecTimeOriginal, decimalLatitude, decimalLongitude};
+    } catch (err) {
+      const latitudeMultiplier = null
+      const decimalLatitude = null
+      const longitudeMultiplier = null
+      const decimalLongitude = null
+      res.locals.exifData = {make, model, osVersion, dateTime, dateTimeOriginal, subSecTimeOriginal, decimalLatitude, decimalLongitude};
+    }
 
-    res.locals.exifData = {make, model, osVersion, dateTime, dateTimeOriginal, subSecTimeOriginal, decimalLatitude, decimalLongitude};
     // console.log(`https://www.google.com/maps?q=${decimalLatitude},${decimalLongitude}`)
     // console.log('model', exifData['0th'][piexif.ImageIFD.Model]);
     next();
@@ -37,10 +45,10 @@ exifController.readExifData = (req, res, next) => {
 
   exifController.modifyExifData = (req, res, next) => {
     const { make, model, osVersion, dateTime, dateTimeOriginal, subSecTimeOriginal, decimalLatitude, decimalLongitude } = req.body;
-    const photoExif = getExifFromJpegFile(path.join(__dirname, '../uploads/', req.body.originalFilename))
-    console.log('about to modify', path.join(__dirname, '../uploads/', req.body.originalFilename));
+    const photoExif = exifController.getExifFromJpegFile(path.join(__dirname, '../uploads/', req.body.originalFilename))
+    // console.log('about to modify', path.join(__dirname, '../uploads/', req.body.originalFilename));
     const newExif = JSON.parse(JSON.stringify(photoExif))
-    const newImageData = getBase64DataFromJpegFile(path.join(__dirname, '../uploads/', req.body.originalFilename));
+    const newImageData = exifController.getBase64DataFromJpegFile(path.join(__dirname, '../uploads/', req.body.originalFilename));
     // console.log(newExif);
     newExif['GPS'][piexif.GPSIFD.GPSLatitude] = piexif.GPSHelper.degToDmsRational(decimalLatitude);
     newExif['GPS'][piexif.GPSIFD.GPSLatitudeRef] = 'N';

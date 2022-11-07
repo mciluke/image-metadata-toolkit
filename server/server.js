@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
 
 const exifController = require('./controllers/exifController');
 const fileController = require('./controllers/fileController');
@@ -8,6 +9,19 @@ const userController = require('./controllers/userController');
 
 const app = express();
 const port = 3000;
+
+
+const storage = multer.diskStorage({
+  destination(request, file, cb) {
+    cb(null, path.join(__dirname, '../uploads'));
+  },
+  filename(request, file, cb) {
+    // console.log(file.originalname)
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage });
+// console.log('dir', path.join(__dirname, '../../uploads'))
 
 // middleware
 
@@ -23,7 +37,7 @@ app.use('/files', express.static(path.join(__dirname, '../uploads')));
 
 app.post(
   '/upload',
-  fileController.uploadFile,
+  upload.single('myImage'),
   exifController.readExifData,
   userController.linkUploadToUser,
   (req, res) => res.json(res.locals.exifData),
@@ -46,5 +60,7 @@ app.get('/checkForUserFiles', userController.checkCookie, fileController.getFile
 app.get('/delete/:file', fileController.deleteFile, (req, res) => {
   res.json(res.locals.newFileList);
 });
+
+app.use('/', express.static(path.join(__dirname, '../build')));
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
