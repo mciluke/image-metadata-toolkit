@@ -1,5 +1,5 @@
 # Image Metadata Toolkit
-Image metadata is text information pertaining to an image file, such as timestamp, location, and device details that is embedded into the image.
+Image metadata is text information pertaining to an image file, such as timestamp, location, and device details that is embedded into an image.
 
 Image Metadata Toolkit is a web app made with Node.js, React, MongoDB, Express, and [piexifjs](https://github.com/hMatoba/piexifjs) that allows users to upload JPEG/JPG photos and modify the metadata embedded within them.
 
